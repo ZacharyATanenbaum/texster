@@ -1,4 +1,9 @@
+import com.twilio.Twilio;
+import com.twilio.rest.api.v2010.account.Message;
+import com.twilio.type.PhoneNumber;
+
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -6,16 +11,25 @@ import java.util.List;
 import java.util.Scanner;
 
 /**
- * Created by Zacht on 6/25/2017.
+ * Using Twilio this program sends an automated test text message on every hour (12:00, 1:00, etc). The info file
+ * should be structures to the below, starting at the first line:
+ *
+ * Twilio Account ID
+ * Twilio Auth Token
+ * Twilio Number (No dashes, parenthesis or anything)
+ * Destination # (Any number of destination numbers)
+ *
  */
+
+
 public class Main {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws URISyntaxException {
 
         final String path = "info";
         List<String> lines;
 
-        // Read Twilio Account ID, Twilio Account Token and all phone numbers from info file
+        // Read info file into lines list.
         try {
             lines = Files.readAllLines(Paths.get(path), StandardCharsets.UTF_8);
 
@@ -23,12 +37,23 @@ public class Main {
             throw new RuntimeException("Error! Unable to read from info file.");
         }
 
-        // Get Twilio info from info file
-        String twilioAccountSid = lines.get(0);
+        // Get Twilio info from lines list
+        final String twilioAccountSid = lines.get(0);
         lines.remove(0);
-        String twilioAuthToken = lines.get(0);
+        final String twilioAuthToken = lines.get(0);
+        lines.remove(0);
+        final String twilioNumber = lines.get(0);
         lines.remove(0);
 
+        // Authenticate with Twilio
+        Twilio.init(twilioAccountSid, twilioAuthToken);
+
+        // Send message with Twilio -> .creator( # to, # from, body);
+        String destinationNumber = "1111111111";
+        Message message = Message
+                .creator(new PhoneNumber(destinationNumber), new PhoneNumber(twilioNumber),
+                        "Test!")
+                .create();
 
         // Start Scanning for Commands
         Scanner scanner = new Scanner(System.in);
