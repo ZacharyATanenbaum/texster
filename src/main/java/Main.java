@@ -23,7 +23,11 @@ public class Main {
             throw new RuntimeException("Error! Unable to read from info file.");
         }
 
-
+        // Get Twilio info from info file
+        String twilioAccountSid = lines.get(0);
+        lines.remove(0);
+        String twilioAuthToken = lines.get(0);
+        lines.remove(0);
 
 
         // Start Scanning for Commands
