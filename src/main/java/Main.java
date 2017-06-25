@@ -48,12 +48,19 @@ public class Main {
         // Authenticate with Twilio
         Twilio.init(twilioAccountSid, twilioAuthToken);
 
-        // Send message with Twilio -> .creator( # to, # from, body);
-        String destinationNumber = "1111111111";
-        Message message = Message
-                .creator(new PhoneNumber(destinationNumber), new PhoneNumber(twilioNumber),
-                        "Test!")
-                .create();
+        // Create new thread to send a message on the hour
+        Thread messageThread = new Thread() {
+            public void run() {
+
+                for (String destinationNumber: lines) {
+                    Message message = Message
+                            .creator(new PhoneNumber("6312238177"), new PhoneNumber(twilioNumber),
+                                    "Test!")
+                            .create();
+                }
+            }
+        };
+        messageThread.start();
 
         // Start Scanning for Commands
         Scanner scanner = new Scanner(System.in);
