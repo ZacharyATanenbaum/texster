@@ -96,6 +96,7 @@ public class Main {
         // Closing Server
         System.out.println("Closing down server.");
         scanner.close();
+        System.exit(0);
 
     }
 
