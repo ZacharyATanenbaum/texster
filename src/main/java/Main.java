@@ -1,5 +1,4 @@
 import com.twilio.Twilio;
-import com.twilio.rest.api.v2010.account.Message;
 import com.twilio.type.PhoneNumber;
 
 import java.io.IOException;
@@ -7,8 +6,7 @@ import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 /**
  * Using Twilio this program sends an automated test text message on every hour (12:00, 1:00, etc). The info file
@@ -42,25 +40,21 @@ public class Main {
         lines.remove(0);
         final String twilioAuthToken = lines.get(0);
         lines.remove(0);
-        final String twilioNumber = lines.get(0);
+        final PhoneNumber twilioNumber = new PhoneNumber(lines.get(0));
         lines.remove(0);
+
+        // Create destination numbers list
+        ArrayList<PhoneNumber> destinationNumbers = new ArrayList<>();
+        for (String destination: lines) {
+            destinationNumbers.add(new PhoneNumber(destination));
+        }
 
         // Authenticate with Twilio
         Twilio.init(twilioAccountSid, twilioAuthToken);
 
         // Create new thread to send a message on the hour
-        Thread messageThread = new Thread() {
-            public void run() {
-
-                for (String destinationNumber: lines) {
-                    Message message = Message
-                            .creator(new PhoneNumber("6312238177"), new PhoneNumber(twilioNumber),
-                                    "Test!")
-                            .create();
-                }
-            }
-        };
-        messageThread.start();
+        Runnable messageThread = new MessageThread(destinationNumbers, twilioNumber);
+        new Thread(messageThread).start();
 
         // Start Scanning for Commands
         Scanner scanner = new Scanner(System.in);
@@ -100,6 +94,5 @@ public class Main {
         scanner.close();
 
     }
-
 
 }
