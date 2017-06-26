@@ -3,9 +3,9 @@ import com.twilio.type.PhoneNumber;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Created by Zacht on 6/25/2017.
@@ -14,22 +14,28 @@ public class MessageThread implements Runnable {
 
     List<PhoneNumber> numbers;
     PhoneNumber twilioNumber;
+    int duration;
 
-    public MessageThread(List<PhoneNumber> numbers, PhoneNumber twilioNumber) {
+    public MessageThread(List<PhoneNumber> numbers, PhoneNumber twilioNumber, int duration) {
         this.numbers = numbers;
         this.twilioNumber = twilioNumber;
+        this.duration = duration;
     }
 
     public void run() {
 
-        // TODO: Finish
-        // Create Timer to send message on the hour
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.SECOND, 0);
- //       Timer timer = new Timer();
- //       timer.schedule(sendMessages(numbers, twilioNumber), );
+        // Create Timer to send a message every X seconds
+        Timer timer = new Timer( );
+        timer.scheduleAtFixedRate(new TimerTask() {
+
+            @Override
+            public void run() {
+                sendMessages(numbers, twilioNumber);
+            }
+        }, 0,duration*1000);
 
     }
+
 
     /**
      * Send a message to each number in the given list from the provided twilio number.

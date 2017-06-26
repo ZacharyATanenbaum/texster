@@ -9,12 +9,13 @@ import java.nio.file.Paths;
 import java.util.*;
 
 /**
- * Using Twilio this program sends an automated test text message on every hour (12:00, 1:00, etc). The info file
+ * Using Twilio this program sends an automated test text message at a specified interval. The info file
  * should be structures to the below, starting at the first line:
  *
  * Twilio Account ID
  * Twilio Auth Token
  * Twilio Number (No dashes, parenthesis or anything)
+ * Duration between texts (In Seconds)
  * Destination # (Any number of destination numbers)
  *
  */
@@ -42,6 +43,9 @@ public class Main {
         lines.remove(0);
         final PhoneNumber twilioNumber = new PhoneNumber(lines.get(0));
         lines.remove(0);
+        final Integer duration = Integer.parseInt(lines.get(0));
+        lines.remove(0);
+
 
         // Create destination numbers list
         ArrayList<PhoneNumber> destinationNumbers = new ArrayList<>();
@@ -52,8 +56,8 @@ public class Main {
         // Authenticate with Twilio
         Twilio.init(twilioAccountSid, twilioAuthToken);
 
-        // Create new thread to send a message on the hour
-        Runnable messageThread = new MessageThread(destinationNumbers, twilioNumber);
+        // Create new thread to send a message for the specified duration
+        Runnable messageThread = new MessageThread(destinationNumbers, twilioNumber, duration);
         new Thread(messageThread).start();
 
         // Start Scanning for Commands
